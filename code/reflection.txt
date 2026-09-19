@@ -1,6 +1,23 @@
-Write your reflection here.
+In this assignment I built a Python package, sales_pipeline, that splits a
+sales report into modules following the ETL pattern: extract.py pulls the raw
+data, transform.py cleans and summarizes it, and display.py loads it in front
+of a person. Three thin reports (Finance, Marketing, Operations) only call the
+package. __init__.py uses relative imports and __all__ to define the public
+API, and keeps clean_currency and clean_quantity internal because they are
+plumbing. The most useful idea was coercion: the export has values like
+"$1,200.00", "N/A", None, and "one", and I learned that one try/except
+ValueError turns every unreadable value into 0.0 or 0 so a single bad row
+never crashes the report. I had not used try/except before this. I also caught
+that putting "return cleaned" inside the loop in clean_sales_data would return
+after only the first row, and the one-row docstring example would still have
+passed, so the bug could have hidden.
 
-See reflection.md for what makes a good reflection — be specific, use the
-terminology from this assignment (package, module, ETL, coercion, public API,
-relative import, accumulator, group by, unit vs. integration test), and make it
-actionable.
+Writing summarize_by_item and summarize_by_day taught me the accumulator and
+group by pattern: a dictionary keyed by item or date that adds each row's
+units and revenue into one entry. Operations needed only one new function
+because find_top_entry only compares entry[field], so it ranks days as easily
+as items. That showed me why a package beats copy-pasting three scripts.
+Unit tests check one function on small clean data, while integration tests
+run whole reports and check the exact printed text on seeded datasets. Next
+time I will run the unit tests after finishing each function and test every
+loop with at least two rows, instead of waiting until the end.
